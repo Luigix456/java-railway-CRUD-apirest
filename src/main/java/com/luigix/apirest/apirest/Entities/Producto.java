@@ -1,4 +1,4 @@
-package com.sergiecode.apirest.apirest.Entities;
+package com.luigix.apirest.apirest.Entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

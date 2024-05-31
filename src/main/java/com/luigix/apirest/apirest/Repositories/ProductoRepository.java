@@ -1,9 +1,8 @@
-package com.sergiecode.apirest.apirest.Repositories;
+package com.luigix.apirest.apirest.Repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.sergiecode.apirest.apirest.Entities.Producto;
+import com.luigix.apirest.apirest.Entities.Producto;
 
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
-
 }
