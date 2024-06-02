@@ -1,81 +1,61 @@
 package com.luigix.apirest.apirest.Controllers;
 
-import com.luigix.apirest.apirest.Entities.Producto;
-import com.luigix.apirest.apirest.Repositories.ProductoRepository;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import com.luigix.apirest.apirest.Repositories.ProductoRepository;
+import com.luigix.apirest.apirest.Entities.Producto;
 
 @RestController
 @RequestMapping("/productos")
 public class ProductoController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProductoController.class);
 
     @Autowired
     private ProductoRepository productoRepository;
 
     @GetMapping
     public List<Producto> obtenerProductos() {
-        logger.info("Obteniendo todos los productos");
         return productoRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> obtenerProductoPorId(@PathVariable Long id) {
-        logger.info("Recibido ID para buscar: {}", id);
-        Producto producto = productoRepository.findById(id).orElse(null);
-
-        if (producto != null) {
-            logger.info("Producto encontrado: {}", producto);
-            return ResponseEntity.ok(producto);
-        } else {
-            logger.warn("No se encontró el producto con el ID: {}", id);
-            return ResponseEntity.notFound().build();
-        }
+    public Producto obtenerProductoPorId(@PathVariable Long id) {
+        return productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No se encontró el producto con el ID: " + id));
     }
 
     @PostMapping
-    public ResponseEntity<Producto> crearProducto(@RequestBody Producto producto) {
-        logger.info("Creando nuevo producto: {}", producto);
-        Producto nuevoProducto = productoRepository.save(producto);
-        logger.info("Producto creado con ID: {}", nuevoProducto.getId());
-        return ResponseEntity.status(201).body(nuevoProducto);
+    public Producto crearProducto(@RequestBody Producto producto) {
+        return productoRepository.save(producto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto detallesProducto) {
-        logger.info("Actualizando producto con ID: {}", id);
-        Producto producto = productoRepository.findById(id).orElse(null);
+    public Producto actualizarProducto(@PathVariable Long id, @RequestBody Producto detallesProducto) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No se encontró el producto con el ID: " + id));
 
-        if (producto != null) {
-            producto.setNombre(detallesProducto.getNombre());
-            producto.setPrecio(detallesProducto.getPrecio());
-            Producto productoActualizado = productoRepository.save(producto);
-            logger.info("Producto actualizado: {}", productoActualizado);
-            return ResponseEntity.ok(productoActualizado);
-        } else {
-            logger.warn("No se encontró el producto con el ID: {}", id);
-            return ResponseEntity.notFound().build();
-        }
+        producto.setNombre(detallesProducto.getNombre());
+        producto.setPrecio(detallesProducto.getPrecio());
+
+        return productoRepository.save(producto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> borrarProducto(@PathVariable Long id) {
-        logger.info("Borrando producto con ID: {}", id);
-        Producto producto = productoRepository.findById(id).orElse(null);
+    public String borrarProducto(@PathVariable Long id) {
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No se encontró el producto con el ID: " + id));
 
-        if (producto != null) {
-            productoRepository.delete(producto);
-            logger.info("Producto con ID: {} fue eliminado", id);
-            return ResponseEntity.ok("El producto con el ID: " + id + " fue eliminado correctamente");
-        } else {
-            logger.warn("No se encontró el producto con el ID: {}", id);
-            return ResponseEntity.notFound().build();
-        }
+        productoRepository.delete(producto);
+        return "El producto con el ID: " + id + " fue eliminado correctamente";
     }
+
 }
